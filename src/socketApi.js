@@ -21,9 +21,10 @@ io.on('connection', (socket) => {
 
         const userData = objectAssign(data, defaultData); // iki değeri birleştirerek tek nesne olarak bize döndürür.
         users[socket.id] = userData // datayı users nesnesinde id altına pushluyoruz.
-        
         console.log(users);
+
         socket.broadcast.emit('newUser', users[socket.id]);
+        socket.emit('initPlayers', users);
     });
 
     socket.on('disconnect', () => {
