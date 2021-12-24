@@ -24,7 +24,7 @@ app.controller('indexController', ['$scope', 'indexFactory', ($scope, indexFacto
 
             socket.on('initPlayers', (players) => { // oyuncu ekleme
                 $scope.players = players;
-                $scope.$apply();
+                $scope.$apply(); // ekranda gösterme angular
             });
 
             // kullanıcının giriş yapması 
@@ -52,7 +52,7 @@ app.controller('indexController', ['$scope', 'indexFactory', ($scope, indexFacto
                 };
                 $scope.messages.push(messageData);
                 delete $scope.players[data.id]; // çıkış yapan kullanıcının animasyonunu silme 
-                $scope.$apply();
+                $scope.$apply(); // ekranda gösterme angular
             });
 
 
@@ -79,6 +79,19 @@ app.controller('indexController', ['$scope', 'indexFactory', ($scope, indexFacto
                         animate = false;
                     });
                 }
+            };
+
+            $scope.newMessage = () => {
+                let message = $scope.message;
+                const messageData = {
+                    type: {
+                        code: 1 // sunucu veya kullanıcı mesajı
+                    }, 
+                    username: username,
+                    text: message
+                };
+                $scope.messages.push(messageData);
+                $scope.message = '';
             };
 
           }).catch((err) => {
