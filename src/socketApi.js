@@ -5,7 +5,7 @@ const io = socketio();
 const socketApi = {};
 socketApi.io = io;
 
-const users = [];
+const users = { };
 
 io.on('connection', (socket) => {
     console.log('a user connected');
@@ -20,7 +20,17 @@ io.on('connection', (socket) => {
         }
 
         const userData = objectAssign(data, defaultData); // iki değeri birleştirerek tek nesne olarak bize döndürür.
-        users.push(userData); // datayı users dizimize pushluyoruz.
+        users[socket.id] = userData // datayı users nesnesinde id altına pushluyoruz.
+        
+        console.log(users);
+        socket.broadcast.emit('newUser', users[socket.id]);
+    });
+
+    socket.on('disconnect', () => {
+        socket.broadcast.emit('disUser', users[socket.id]);
+        delete users[socket.id];
+
+        console.log(users);
     });
 });
 
