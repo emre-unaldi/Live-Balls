@@ -7,6 +7,9 @@ socketApi.io = io;
 
 const users = { };
 
+// helpers
+const randomColor = require('../helpers/randomColor');
+
 io.on('connection', (socket) => {
     console.log('a user connected');
     
@@ -17,12 +20,11 @@ io.on('connection', (socket) => {
             position:  {
                 x: 0,
                 y: 0
-            }
+            },
+            color: randomColor()
         }
-
         const userData = objectAssign(data, defaultData); // iki değeri birleştirerek tek nesne olarak bize döndürür.
         users[socket.id] = userData // datayı users nesnesinde id altına pushluyoruz.
-        console.log(users);
 
         socket.broadcast.emit('newUser', users[socket.id]); // tüm clientlara gösterme
         socket.emit('initPlayers', users); // oyuncu ekleme 
@@ -30,11 +32,23 @@ io.on('connection', (socket) => {
 
     //  kullanıcının ayrılması ve silinmesi
     socket.on('disconnect', () => {
-        socket.broadcast.emit('disUser', users[socket.id]); 
-        delete users[socket.id];
-
-        console.log(users);
+        socket.broadcast.emit('disUser', users[socket.id]); // tüm clientlarda ayrılma
+        delete users[socket.id]; // çıkış yapan kullanıcıyı silme 
     });
+
+    // koordinat bilgisini alıp arka tarafta güncelleme
+    socket.on('animate', (data) => {
+        users[socket.id].position.x = data.x;
+        users[socket.id].position.y = data.y;
+
+        // koordinat bilgisinin tüm clientlara yansıtılması
+        socket.broadcast.emit('animate', { 
+            socketId: socket.id, 
+            x: data.x, 
+            y: data.y 
+        });
+    });
+
 });
 
 module.exports = socketApi;

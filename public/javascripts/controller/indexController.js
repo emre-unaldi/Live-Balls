@@ -51,22 +51,34 @@ app.controller('indexController', ['$scope', 'indexFactory', ($scope, indexFacto
                     username: data.username
                 };
                 $scope.messages.push(messageData);
-                delete $scope.players[data.id];
+                delete $scope.players[data.id]; // çıkış yapan kullanıcının animasyonunu silme 
                 $scope.$apply();
             });
+
+
+            socket.on('animate', (data) => {
+                console.log(data);
+                $('#' + data.socketId).animate({ 'left': data.x, 'top': data.y }, () => {
+                    animate = false;
+                });
+            });
+
 
             // animasyon kontrolü
             let animate = false;
             $scope.onClickPlayer = ($event) => {
-                console.log($event.offsetX, $event.offsetY);
-
                 if(!animate){
+                    let x = $event.offsetX;
+                    let y = $event.offsetY;
+
+                    // koordinat bilgisini alıp arka tarafta güncelleme
+                    socket.emit('animate', { x, y });
+
                     animate = true;
-                    $('#' + socket.id).animate({ 'left': $event.offsetX, 'top': $event.offsetY }, () => {
+                    $('#' + socket.id).animate({ 'left': x, 'top': y }, () => {
                         animate = false;
                     });
                 }
-
             };
 
           }).catch((err) => {
