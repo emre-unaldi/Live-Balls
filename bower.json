@@ -1,0 +1,14 @@
+{
+  "name": "socketio-live-balls",
+  "description": "",
+  "main": "",
+  "authors": [
+    "emre-unaldi <emree.unaldi@gmail.com>"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/emre-unaldi/Live-Balls",
+  "dependencies": {
+    "angular": "^1.8.2",
+    "semantic": "^2.4.1"
+  }
+}
