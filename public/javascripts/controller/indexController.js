@@ -20,13 +20,14 @@ app.controller('indexController', ['$scope', 'indexFactory', ($scope, indexFacto
         
         indexFactory.connectSocket('http://localhost:3000', connectionoptions)
           .then((socket) => {
-            socket.emit('newUser', { username });
+            socket.emit('newUser', { username }); // kullanıcın giriş yapması 
 
-            socket.on('initPlayers', (players) => {
+            socket.on('initPlayers', (players) => { // oyuncu ekleme
                 $scope.players = players;
                 $scope.$apply();
             });
 
+            // kullanıcının giriş yapması 
             socket.on('newUser', (data) =>{
                 const messageData = {
                     type: {
@@ -36,9 +37,10 @@ app.controller('indexController', ['$scope', 'indexFactory', ($scope, indexFacto
                     username: data.username
                 };
                 $scope.messages.push(messageData);
-                $scope.$apply();
+                $scope.$apply(); // ekranda gösterme angular
             });
 
+            //  kullanıcının ayrılması ve silinmesi 
             socket.on('disUser', (data) => {
                 const messageData = {
                     type: {
@@ -51,6 +53,21 @@ app.controller('indexController', ['$scope', 'indexFactory', ($scope, indexFacto
                 $scope.$apply();
                 console.log(data);
             });
+
+            // animasyon kontrolü
+            let animate = false;
+            $scope.onClickPlayer = ($event) => {
+                console.log($event.offsetX, $event.offsetY);
+
+                if(!animate){
+                    animate = true;
+                    $('#' + socket.id).animate({ 'left': $event.offsetX, 'top': $event.offsetY }, () => {
+                        animate = false;
+                    });
+                }
+
+            };
+
           }).catch((err) => {
             console.log(err);
           });

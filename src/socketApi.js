@@ -9,7 +9,8 @@ const users = { };
 
 io.on('connection', (socket) => {
     console.log('a user connected');
-
+    
+    // kullanıcın giriş yapması 
     socket.on('newUser', (data) => {
         const defaultData = {
             id: socket.id,
@@ -23,12 +24,13 @@ io.on('connection', (socket) => {
         users[socket.id] = userData // datayı users nesnesinde id altına pushluyoruz.
         console.log(users);
 
-        socket.broadcast.emit('newUser', users[socket.id]);
-        socket.emit('initPlayers', users);
+        socket.broadcast.emit('newUser', users[socket.id]); // tüm clientlara gösterme
+        socket.emit('initPlayers', users); // oyuncu ekleme 
     });
 
+    //  kullanıcının ayrılması ve silinmesi
     socket.on('disconnect', () => {
-        socket.broadcast.emit('disUser', users[socket.id]);
+        socket.broadcast.emit('disUser', users[socket.id]); 
         delete users[socket.id];
 
         console.log(users);
