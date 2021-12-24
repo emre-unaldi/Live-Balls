@@ -37,6 +37,7 @@ app.controller('indexController', ['$scope', 'indexFactory', ($scope, indexFacto
                     username: data.username
                 };
                 $scope.messages.push(messageData);
+                $scope.players[data.id] = data;
                 $scope.$apply(); // ekranda gösterme angular
             });
 
@@ -50,8 +51,8 @@ app.controller('indexController', ['$scope', 'indexFactory', ($scope, indexFacto
                     username: data.username
                 };
                 $scope.messages.push(messageData);
+                delete $scope.players[data.id];
                 $scope.$apply();
-                console.log(data);
             });
 
             // animasyon kontrolü
