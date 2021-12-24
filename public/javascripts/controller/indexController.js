@@ -12,6 +12,14 @@ app.controller('indexController', ['$scope', 'indexFactory', ($scope, indexFacto
         }
     };
     
+    // sohbet kısmı kaydırma işlemi
+    function scrollTop() {
+        setTimeout(() => {
+            const element = document.getElementById('chat-area');
+            element.scrollTop = element.scrollHeight;   
+        });
+    };
+
     function initSocket(username) {
         const connectionoptions = {
             reconnectionAttempts: 3,
@@ -63,6 +71,11 @@ app.controller('indexController', ['$scope', 'indexFactory', ($scope, indexFacto
                 });
             });
 
+            socket.on('newMessage', (message) => {
+                $scope.messages.push(message);
+                $scope.$apply(); // anguların gelen datayı ön tarafta build eder
+                scrollTop();
+            });
 
             // animasyon kontrolü
             let animate = false;
@@ -92,6 +105,9 @@ app.controller('indexController', ['$scope', 'indexFactory', ($scope, indexFacto
                 };
                 $scope.messages.push(messageData);
                 $scope.message = '';
+
+                socket.emit('newMessage', messageData );
+                scrollTop();
             };
 
           }).catch((err) => {
