@@ -38,19 +38,25 @@ io.on('connection', (socket) => {
 
     // koordinat bilgisini alıp arka tarafta güncelleme
     socket.on('animate', (data) => {
-        users[socket.id].position.x = data.x;
-        users[socket.id].position.y = data.y;
+        try {
+            users[socket.id].position.x = data.x;
+            users[socket.id].position.y = data.y;
 
-        // koordinat bilgisinin tüm clientlara yansıtılması
-        socket.broadcast.emit('animate', { 
+            // koordinat bilgisinin tüm clientlara yansıtılması
+            socket.broadcast.emit('animate', { 
             socketId: socket.id, 
             x: data.x, 
             y: data.y 
         });
+        } catch (err) {
+            console.log(err);
+        }
+        
     });
 
     socket.on('newMessage', (data) => {
-        socket.broadcast.emit('newMessage', data);
+        const messageData = objectAssign({ socketId: socket.id }, data);
+        socket.broadcast.emit('newMessage', messageData);
     });
 
 });

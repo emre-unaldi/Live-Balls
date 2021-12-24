@@ -20,14 +20,23 @@ app.controller('indexController', ['$scope', 'indexFactory', ($scope, indexFacto
         });
     };
 
-    function initSocket(username) {
+    function showBubble(id, message){
+        $('#' + id).find('.message').show().html(message);
+
+        setTimeout(() => {
+            $('#' + id).find('.message').hide();
+        }, 3000);
+    };
+
+    
+    async  function initSocket(username) {
         const connectionoptions = {
             reconnectionAttempts: 3,
             reconnectionDelay: 600
         };
-        
-        indexFactory.connectSocket('http://localhost:3000', connectionoptions)
-          .then((socket) => {
+    
+        try {
+            const socket = await indexFactory.connectSocket('http://localhost:3000', connectionoptions);
             socket.emit('newUser', { username }); // kullanıcın giriş yapması 
 
             socket.on('initPlayers', (players) => { // oyuncu ekleme
@@ -46,6 +55,7 @@ app.controller('indexController', ['$scope', 'indexFactory', ($scope, indexFacto
                 };
                 $scope.messages.push(messageData);
                 $scope.players[data.id] = data;
+                scrollTop();
                 $scope.$apply(); // ekranda gösterme angular
             });
 
@@ -60,6 +70,7 @@ app.controller('indexController', ['$scope', 'indexFactory', ($scope, indexFacto
                 };
                 $scope.messages.push(messageData);
                 delete $scope.players[data.id]; // çıkış yapan kullanıcının animasyonunu silme 
+                scrollTop();
                 $scope.$apply(); // ekranda gösterme angular
             });
 
@@ -74,6 +85,7 @@ app.controller('indexController', ['$scope', 'indexFactory', ($scope, indexFacto
             socket.on('newMessage', (message) => {
                 $scope.messages.push(message);
                 $scope.$apply(); // anguların gelen datayı ön tarafta build eder
+                showBubble(message.socketId, message.text);
                 scrollTop();
             });
 
@@ -107,12 +119,11 @@ app.controller('indexController', ['$scope', 'indexFactory', ($scope, indexFacto
                 $scope.message = '';
 
                 socket.emit('newMessage', messageData );
+                showBubble(socket.id, message);
                 scrollTop();
             };
-
-          }).catch((err) => {
+        }catch (err) {
             console.log(err);
-          });
+        }
     };
-    
 }]);
