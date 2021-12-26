@@ -27,16 +27,6 @@ body{
   top: 100px
 }
 
-.blue {
-  background-color: #3498db;
-}
-.green {
-  background-color: #16a085;
-}
-.red {
-  background-color: #e74c3c;
-}
-
 .circle .relative{
   position: relative;
 }
@@ -61,7 +51,7 @@ body{
   margin-right: 10px!important;
   margin-left: 10px!important;
   height: 90px;
-  overflow-y: auto;
+  overflow-y: auto
 }
 .chat .content{
   text-align: left;

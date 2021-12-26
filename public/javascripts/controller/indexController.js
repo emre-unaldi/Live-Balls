@@ -1,4 +1,4 @@
-app.controller('indexController', ['$scope', 'indexFactory', ($scope, indexFactory) => {
+app.controller('indexController', ['$scope', 'indexFactory', 'configFactory', ($scope, indexFactory, configFactory) => {
 
     $scope.messages = [ ];
     $scope.players = { };
@@ -20,23 +20,40 @@ app.controller('indexController', ['$scope', 'indexFactory', ($scope, indexFacto
         });
     };
 
-    function showBubble(id, message){
-        $('#' + id).find('.message').show().html(message);
+    function bubbleLifeTime(message) {
+		const min = 500;  // min bubble life time
+		const max = 3000; // max bubble life time
+		const msPerLetter = 40; // miliseconds per letter
+		let bubbleTime;
 
-        setTimeout(() => {
-            $('#' + id).find('.message').hide();
-        }, 3000);
-    };
+		bubbleTime = min + (message.length * msPerLetter);
+
+		if (bubbleTime > max)
+			return max;
+		else
+			return bubbleTime;
+
+	}
+
+    function showBubble(id, message) {
+		$('#'+ id).find('.message').show().text(message);
+
+		setTimeout(() => {
+			$('#'+ id).find('.message').hide();
+		}, bubbleLifeTime(message));
+	}
 
     
     async  function initSocket(username) {
-        const connectionoptions = {
-            reconnectionAttempts: 3,
-            reconnectionDelay: 600
-        };
+        const connectionOptions = {
+			reconnectionAttempts: 3,
+			reconnectionDelay: 600
+		};
     
         try {
-            const socket = await indexFactory.connectSocket('http://localhost:3000', connectionoptions);
+            const sockerUrl = await configFactory.getConfig();
+			const socket = await indexFactory.connectSocket(sockerUrl.data.socketUrl, connectionOptions);
+            
             socket.emit('newUser', { username }); // kullanıcın giriş yapması 
 
             socket.on('initPlayers', (players) => { // oyuncu ekleme
@@ -76,7 +93,6 @@ app.controller('indexController', ['$scope', 'indexFactory', ($scope, indexFacto
 
 
             socket.on('animate', (data) => {
-                console.log(data);
                 $('#' + data.socketId).animate({ 'left': data.x, 'top': data.y }, () => {
                     animate = false;
                 });
@@ -108,6 +124,7 @@ app.controller('indexController', ['$scope', 'indexFactory', ($scope, indexFacto
 
             $scope.newMessage = () => {
                 let message = $scope.message;
+                
                 const messageData = {
                     type: {
                         code: 1 // sunucu veya kullanıcı mesajı
